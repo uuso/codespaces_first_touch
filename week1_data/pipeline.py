@@ -27,7 +27,7 @@ def main(params):
     #creating schema
     df_schema = pd.read_csv(csv_name, nrows=0, \
                     parse_dates=['tpep_pickup_datetime', 'tpep_dropoff_datetime'])
-    df_schema.to_sql(con=engine, name=table_name, if_exists= 'replace')
+    df_schema.to_sql(con=engine, name=table_name, if_exists='replace')
 
 
     df_iter = pd.read_csv(csv_name, \
