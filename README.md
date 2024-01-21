@@ -122,3 +122,49 @@ docker run -it --network=week1_data_default test:v1 \
 --db ny_taxi \
 --table_name ny_taxi \
 --url "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz"
+
+
+## Terraform
+
+https://www.youtube.com/watch?v=Y2ux7gq3Z0o&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=14
+
+Установить yandex cli
+https://cloud.yandex.ru/ru/docs/cli/quickstart#install 
+
+```bash
+curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+echo 'source /home/codespace/yandex-cloud/completion.zsh.inc' >>  ~/.zshrc
+source "/home/codespace/.bashrc"
+yc init
+```
+
+Буду устанавливать terraform для доступа к яндекс облаку, что-то придумаю вместо BigQuery
+https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
+
+```
+sudo apt-get update && sudo apt-get install -y gnupg software-properties-common
+
+wget -O- https://apt.releases.hashicorp.com/gpg | \
+gpg --dearmor | \
+sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+gpg --no-default-keyring \
+--keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg \
+--fingerprint
+
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] \
+https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+sudo apt update
+
+sudo apt-get install terraform
+
+terraform -help
+
+touch ~/.zshrc
+
+terraform -install-autocomplete
+```
+
+yc iam key create --service-account-name test-terraform -o test-terraform-api-key.json
