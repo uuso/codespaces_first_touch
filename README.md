@@ -135,13 +135,13 @@ https://cloud.yandex.ru/ru/docs/cli/quickstart#install
 curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
 echo 'source /home/codespace/yandex-cloud/completion.zsh.inc' >>  ~/.zshrc
 source "/home/codespace/.bashrc"
-yc init
+# yc init -- передумал, т.к. даст полные права к аккаунту клауда
 ```
 
 Буду устанавливать terraform для доступа к яндекс облаку, что-то придумаю вместо BigQuery
 https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
 
-```
+```bash
 sudo apt-get update && sudo apt-get install -y gnupg software-properties-common
 
 wget -O- https://apt.releases.hashicorp.com/gpg | \
@@ -167,4 +167,70 @@ touch ~/.zshrc
 terraform -install-autocomplete
 ```
 
-yc iam key create --service-account-name test-terraform -o test-terraform-api-key.json
+Создал .gitignore с */key/
+
+https://cloud.yandex.ru/ru/docs/iam/operations/authorized-key/create#cli_1
+
+```bash
+yc iam key create --service-account-name terraform-test -o key/terraform-test-api-key.json
+
+yc resource-manager cloud list && yc resource-manager folder list
+
+yc config profile create terraform-test
+yc config set service-account-key key/terraform-test-api-key.json
+yc config set cloud-id <идентификатор_облака>
+yc config set folder-id <идентификатор_каталога>  
+
+export YC_TOKEN=$(yc iam create-token)
+export YC_CLOUD_ID=$(yc config get cloud-id)
+export YC_FOLDER_ID=$(yc config get folder-id)
+```
+
+Настройка работы с YC закончена
+
+### Настройка terraform [@cloud.yandex.ru](https://cloud.yandex.ru/docs/tutorials/infrastructure-management/terraform-quickstart#configure-provider)
+
+```bash
+mv ~/.terraformrc ~/.terraformrc.old
+nano ~/.terraformrc
+```
+
+```
+provider_installation {
+  network_mirror {
+    url = "https://terraform-mirror.yandexcloud.net/"
+    include = ["registry.terraform.io/*/*"]
+  }
+  direct {
+    exclude = ["registry.terraform.io/*/*"]
+  }
+}
+```
+
+Заготовка для файлов *.tf:
+```
+terraform {
+  required_providers {
+    yandex = {
+      source = "yandex-cloud/yandex"
+    }
+  }
+  required_version = ">= 0.13"
+}
+
+provider "yandex" {
+  zone = "ru-central1-a"
+}
+```
+
+```bash
+terraform init
+terraform plan
+terraform apply
+```
+
+Для работы apply потребовался ещё статический ключ для аккаунта 
+
+https://cloud.yandex.ru/ru/docs/iam/operations/sa/create-access-key#console_1
+
+https://github.com/yandex-cloud/terraform-provider-yandex/issues/179
